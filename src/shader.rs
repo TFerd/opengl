@@ -121,8 +121,8 @@ impl ShaderProgram {
         unsafe { gl::DeleteProgram(self.0) }
     }
 
-    //Creates the program using vertex and fragment shader
-    pub fn create_program_from_shaders(vert: &str, frag: &str) -> Result<Self, String> {
+    //Creates the program using vertex and fragment SOURCE CODE
+    pub fn create_program_from_src(vert: &str, frag: &str) -> Result<Self, String> {
         let program = Self::new().ok_or_else(|| "Failed to create program".to_string())?;
 
         let vertex = Shader::new_shader_from_src(ShaderType::Vertex, vert)
