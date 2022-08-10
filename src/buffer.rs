@@ -3,10 +3,10 @@ use gl::types::*;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BufferType {
     // Array Buffers holds arrays of vertex data for drawing.
-    Array = gl::ARRAY_BUFFER as isize,
+    Array = gl::ARRAY_BUFFER as isize, //VBO
 
     // Element Array Buffers hold indexes of what vertexes to use for drawing.
-    ElementArray = gl::ELEMENT_ARRAY_BUFFER as isize,
+    ElementArray = gl::ELEMENT_ARRAY_BUFFER as isize, //EBO
 }
 
 pub struct Buffer(pub GLuint);

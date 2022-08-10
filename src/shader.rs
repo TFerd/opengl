@@ -1,3 +1,5 @@
+use std::ffi::CString;
+
 use gl::types::*;
 
 pub enum ShaderType {
@@ -42,7 +44,7 @@ impl Shader {
     }
 
     //Automatically creates and compiles shader based on type and source code params
-    pub fn new_shader_from_src(shader_type: ShaderType, src: &str) -> Result<Self, String> {
+    pub fn create_shader_from_src(shader_type: ShaderType, src: &str) -> Result<Self, String> {
         let shader =
             Self::new(shader_type).ok_or_else(|| "Couldn't create new shader".to_string())?;
         shader.set_source(src);
@@ -125,10 +127,10 @@ impl ShaderProgram {
     pub fn create_program_from_src(vert: &str, frag: &str) -> Result<Self, String> {
         let program = Self::new().ok_or_else(|| "Failed to create program".to_string())?;
 
-        let vertex = Shader::new_shader_from_src(ShaderType::Vertex, vert)
+        let vertex = Shader::create_shader_from_src(ShaderType::Vertex, vert)
             .map_err(|e| format!("Vertex shader failed to compile: {}", e))?;
 
-        let fragment = Shader::new_shader_from_src(ShaderType::Fragment, frag)
+        let fragment = Shader::create_shader_from_src(ShaderType::Fragment, frag)
             .map_err(|e| format!("Fragment shader failed to compile: {}", e))?;
 
         program.attach_shader(&vertex);
@@ -145,6 +147,28 @@ impl ShaderProgram {
             program.delete();
             Err(output)
         }
+    }
+
+    pub fn create_program_from_files(vert_path: &str, frag_path: &str) -> Result<Self, String> {
+        //Read get src from files
+        let vert_src = std::fs::read_to_string(vert_path).unwrap_or_else(|_| {
+            panic!(
+                "Failed to read Vertex Shader source from path: {}",
+                vert_path
+            )
+        });
+
+        let frag_src = std::fs::read_to_string(frag_path).unwrap_or_else(|_| {
+            panic!(
+                "Failed to read Fragment Shader source from path: {}",
+                frag_path
+            )
+        });
+
+        let program = Self::create_program_from_src(&vert_src, &frag_src)
+            .map_err(|e| format!("Failed to create program from files: {}", e));
+
+        program
     }
 
     pub fn get_error_log(&self) -> String {
@@ -169,4 +193,25 @@ impl ShaderProgram {
 
         String::from_utf8_lossy(&v).into_owned()
     }
+
+    pub fn get_uniform_location(&self, name: &str) -> Option<i32> {
+        let c_name = CString::new(name).unwrap();
+        let location: i32;
+
+        unsafe {
+            location = gl::GetUniformLocation(self.0, c_name.as_ptr());
+        };
+
+        if location != -1 {
+            Some(location)
+        } else {
+            None
+        }
+    }
+}
+
+// TODO: generalize this function (aka, make it uniform instead of uniform 4f
+// and let them enter what they want)
+pub fn uniform4f(location: i32, r: f32, g: f32, b: f32, a: f32) {
+    unsafe { gl::Uniform4f(location, r, g, b, a) }
 }
