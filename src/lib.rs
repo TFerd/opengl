@@ -8,7 +8,9 @@ use gl::types::*;
 pub mod buffer;
 pub mod error_handling;
 pub mod shader;
+pub mod texture;
 pub mod vertex_array;
+pub mod window;
 
 pub fn clear_color(r: f32, g: f32, b: f32, a: f32) {
     unsafe {
