@@ -7,6 +7,7 @@ use gl::types::*;
 
 pub mod buffer;
 pub mod error_handling;
+pub mod math;
 pub mod shader;
 pub mod texture;
 pub mod vertex_array;
