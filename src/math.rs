@@ -193,207 +193,53 @@ impl Matrix4 {
         }
     }
 
-    //#[cfg_attr(rustfmt, rustfmt_skip)]
+    // #[cfg_attr(rustfmt, rustfmt_skip)]
     // remember that each Vector is a COLUMN
-    // ROWS of LEFT , COLUMNS of RIGHT matrix
+    // traverse left to right of LEFT matrix , top to bottom of RIGHT matrix
     // Consuming bc we dont want the old matrix
     pub fn transform(&mut self, m: Matrix4) {
-        //   c,r
-        // Matrix4::new(
-        //     self.x.x * d
-        // )
         let col0 = Vector4::new(
-            {
-                let mut sum = 0.0;
-                let row: [f32; 4] = self.get_row(0);
-                let col: [f32; 4] = m.get_column(0);
-
-                for i in 0..row.len() {
-                    sum += row[i] * col[i];
-                }
-
-                sum
-            },
-            {
-                let mut sum = 0.0;
-                let row: [f32; 4] = self.get_row(1);
-                let col: [f32; 4] = m.get_column(0);
-
-                for i in 0..row.len() {
-                    sum += row[i] * col[i];
-                }
-
-                sum
-            },
-            {
-                let mut sum = 0.0;
-                let row: [f32; 4] = self.get_row(2);
-                let col: [f32; 4] = m.get_column(0);
-
-                for i in 0..row.len() {
-                    sum += row[i] * col[i];
-                }
-
-                sum
-            },
-            {
-                let mut sum = 0.0;
-                let row: [f32; 4] = self.get_row(3);
-                let col: [f32; 4] = m.get_column(0);
-
-                for i in 0..row.len() {
-                    sum += row[i] * col[i];
-                }
-
-                sum
-            },
+            Matrix4::multiply_col_with_row(m.get_column(0), self.get_row(0)),
+            Matrix4::multiply_col_with_row(m.get_column(0), self.get_row(1)),
+            Matrix4::multiply_col_with_row(m.get_column(0), self.get_row(2)),
+            Matrix4::multiply_col_with_row(m.get_column(0), self.get_row(3)),
         );
 
         let col1 = Vector4::new(
-            {
-                let mut sum = 0.0;
-                let row: [f32; 4] = self.get_row(0);
-                let col: [f32; 4] = m.get_column(1);
-
-                for i in 0..row.len() {
-                    sum += row[i] * col[i];
-                }
-
-                sum
-            },
-            {
-                let mut sum = 0.0;
-                let row: [f32; 4] = self.get_row(1);
-                let col: [f32; 4] = m.get_column(1);
-
-                for i in 0..row.len() {
-                    sum += row[i] * col[i];
-                }
-
-                sum
-            },
-            {
-                let mut sum = 0.0;
-                let row: [f32; 4] = self.get_row(2);
-                let col: [f32; 4] = m.get_column(1);
-
-                for i in 0..row.len() {
-                    sum += row[i] * col[i];
-                }
-
-                sum
-            },
-            {
-                let mut sum = 0.0;
-                let row: [f32; 4] = self.get_row(3);
-                let col: [f32; 4] = m.get_column(1);
-
-                for i in 0..row.len() {
-                    sum += row[i] * col[i];
-                }
-
-                sum
-            },
+            Matrix4::multiply_col_with_row(m.get_column(1), self.get_row(0)),
+            Matrix4::multiply_col_with_row(m.get_column(1), self.get_row(1)),
+            Matrix4::multiply_col_with_row(m.get_column(1), self.get_row(2)),
+            Matrix4::multiply_col_with_row(m.get_column(1), self.get_row(3)),
         );
 
         let col2 = Vector4::new(
-            {
-                let mut sum = 0.0;
-                let row: [f32; 4] = self.get_row(0);
-                let col: [f32; 4] = m.get_column(2);
-
-                for i in 0..row.len() {
-                    sum += row[i] * col[i];
-                }
-
-                sum
-            },
-            {
-                let mut sum = 0.0;
-                let row: [f32; 4] = self.get_row(1);
-                let col: [f32; 4] = m.get_column(2);
-
-                for i in 0..row.len() {
-                    sum += row[i] * col[i];
-                }
-
-                sum
-            },
-            {
-                let mut sum = 0.0;
-                let row: [f32; 4] = self.get_row(2);
-                let col: [f32; 4] = m.get_column(2);
-
-                for i in 0..row.len() {
-                    sum += row[i] * col[i];
-                }
-
-                sum
-            },
-            {
-                let mut sum = 0.0;
-                let row: [f32; 4] = self.get_row(3);
-                let col: [f32; 4] = m.get_column(2);
-
-                for i in 0..row.len() {
-                    sum += row[i] * col[i];
-                }
-
-                sum
-            },
+            Matrix4::multiply_col_with_row(m.get_column(2), self.get_row(0)),
+            Matrix4::multiply_col_with_row(m.get_column(2), self.get_row(1)),
+            Matrix4::multiply_col_with_row(m.get_column(2), self.get_row(2)),
+            Matrix4::multiply_col_with_row(m.get_column(2), self.get_row(3)),
         );
 
         let col3 = Vector4::new(
-            {
-                let mut sum = 0.0;
-                let row: [f32; 4] = self.get_row(0);
-                let col: [f32; 4] = m.get_column(3);
-
-                for i in 0..row.len() {
-                    sum += row[i] * col[i];
-                }
-
-                sum
-            },
-            {
-                let mut sum = 0.0;
-                let row: [f32; 4] = self.get_row(1);
-                let col: [f32; 4] = m.get_column(3);
-
-                for i in 0..row.len() {
-                    sum += row[i] * col[i];
-                }
-
-                sum
-            },
-            {
-                let mut sum = 0.0;
-                let row: [f32; 4] = self.get_row(2);
-                let col: [f32; 4] = m.get_column(3);
-
-                for i in 0..row.len() {
-                    sum += row[i] * col[i];
-                }
-
-                sum
-            },
-            {
-                let mut sum = 0.0;
-                let row: [f32; 4] = self.get_row(3);
-                let col: [f32; 4] = m.get_column(3);
-
-                for i in 0..row.len() {
-                    sum += row[i] * col[i];
-                }
-
-                sum
-            },
+            Matrix4::multiply_col_with_row(m.get_column(3), self.get_row(0)),
+            Matrix4::multiply_col_with_row(m.get_column(3), self.get_row(1)),
+            Matrix4::multiply_col_with_row(m.get_column(3), self.get_row(2)),
+            Matrix4::multiply_col_with_row(m.get_column(3), self.get_row(3)),
         );
 
         self.x = col0;
         self.y = col1;
         self.z = col2;
         self.w = col3;
+    }
+
+    fn multiply_col_with_row(col: [f32; 4], row: [f32; 4]) -> f32 {
+        let mut sum = 0.0;
+
+        for i in 0..col.len() {
+            sum += col[i] * row[i];
+        }
+
+        sum
     }
 
     pub fn print(&self) {
@@ -503,9 +349,9 @@ mod matrix_tests {
     #[cfg_attr(rustfmt, rustfmt_skip)]
     fn test_matrix_transform() {
         let mut m1 = Matrix4::new(
-            2.0, 1.0, 6.0, 1.0, 
-            3.0, 2.0, 7.0, 2.0, 
-            4.0, 3.0, 8.0, 3.0, 
+            2.0, 1.0, 6.0, 1.0,
+            3.0, 2.0, 7.0, 2.0,
+            4.0, 3.0, 8.0, 3.0,
             5.0, 4.0, 9.0, 4.0
         );
 
@@ -536,5 +382,15 @@ mod matrix_tests {
         assert_eq!(col0[2], 167.0);
         assert_eq!(col0[3],57.0);
 
+    }
+
+    #[test]
+    fn test_multiply_colrow() {
+        let col: [f32; 4] = [4.0, 5.0, 3.5, 0.7];
+        let row: [f32; 4] = [1.3, 1.2, 0.7, 0.4];
+
+        let res = (Matrix4::multiply_col_with_row(col, row) * 100.0).round() / 100.0; // rounded to two decimal places
+
+        assert_eq!(res, 13.93);
     }
 }
