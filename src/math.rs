@@ -176,6 +176,11 @@ impl Matrix4 {
 
             row
         }
+
+        // // non-consuming
+        // pub fn to_array(self) -> [[f32; 4]; 4] {
+        //     let swag =
+        // }
     }
 
     pub fn get_column(&self, i: usize) -> [f32; 4] {
@@ -186,6 +191,206 @@ impl Matrix4 {
             3 => self.w.as_array(),
             _ => panic!("Index provided to get_column is out of bounds!"),
         }
+    }
+
+    //#[cfg_attr(rustfmt, rustfmt_skip)]
+    // remember that each Vector is a COLUMN
+    // ROWS of LEFT , COLUMNS of RIGHT matrix
+    // Consuming bc we dont want the old matrix
+    pub fn transform(&mut self, m: Matrix4) {
+        //   c,r
+        // Matrix4::new(
+        //     self.x.x * d
+        // )
+        let col0 = Vector4::new(
+            {
+                let mut sum = 0.0;
+                let row: [f32; 4] = self.get_row(0);
+                let col: [f32; 4] = m.get_column(0);
+
+                for i in 0..row.len() {
+                    sum += row[i] * col[i];
+                }
+
+                sum
+            },
+            {
+                let mut sum = 0.0;
+                let row: [f32; 4] = self.get_row(1);
+                let col: [f32; 4] = m.get_column(0);
+
+                for i in 0..row.len() {
+                    sum += row[i] * col[i];
+                }
+
+                sum
+            },
+            {
+                let mut sum = 0.0;
+                let row: [f32; 4] = self.get_row(2);
+                let col: [f32; 4] = m.get_column(0);
+
+                for i in 0..row.len() {
+                    sum += row[i] * col[i];
+                }
+
+                sum
+            },
+            {
+                let mut sum = 0.0;
+                let row: [f32; 4] = self.get_row(3);
+                let col: [f32; 4] = m.get_column(0);
+
+                for i in 0..row.len() {
+                    sum += row[i] * col[i];
+                }
+
+                sum
+            },
+        );
+
+        let col1 = Vector4::new(
+            {
+                let mut sum = 0.0;
+                let row: [f32; 4] = self.get_row(0);
+                let col: [f32; 4] = m.get_column(1);
+
+                for i in 0..row.len() {
+                    sum += row[i] * col[i];
+                }
+
+                sum
+            },
+            {
+                let mut sum = 0.0;
+                let row: [f32; 4] = self.get_row(1);
+                let col: [f32; 4] = m.get_column(1);
+
+                for i in 0..row.len() {
+                    sum += row[i] * col[i];
+                }
+
+                sum
+            },
+            {
+                let mut sum = 0.0;
+                let row: [f32; 4] = self.get_row(2);
+                let col: [f32; 4] = m.get_column(1);
+
+                for i in 0..row.len() {
+                    sum += row[i] * col[i];
+                }
+
+                sum
+            },
+            {
+                let mut sum = 0.0;
+                let row: [f32; 4] = self.get_row(3);
+                let col: [f32; 4] = m.get_column(1);
+
+                for i in 0..row.len() {
+                    sum += row[i] * col[i];
+                }
+
+                sum
+            },
+        );
+
+        let col2 = Vector4::new(
+            {
+                let mut sum = 0.0;
+                let row: [f32; 4] = self.get_row(0);
+                let col: [f32; 4] = m.get_column(2);
+
+                for i in 0..row.len() {
+                    sum += row[i] * col[i];
+                }
+
+                sum
+            },
+            {
+                let mut sum = 0.0;
+                let row: [f32; 4] = self.get_row(1);
+                let col: [f32; 4] = m.get_column(2);
+
+                for i in 0..row.len() {
+                    sum += row[i] * col[i];
+                }
+
+                sum
+            },
+            {
+                let mut sum = 0.0;
+                let row: [f32; 4] = self.get_row(2);
+                let col: [f32; 4] = m.get_column(2);
+
+                for i in 0..row.len() {
+                    sum += row[i] * col[i];
+                }
+
+                sum
+            },
+            {
+                let mut sum = 0.0;
+                let row: [f32; 4] = self.get_row(3);
+                let col: [f32; 4] = m.get_column(2);
+
+                for i in 0..row.len() {
+                    sum += row[i] * col[i];
+                }
+
+                sum
+            },
+        );
+
+        let col3 = Vector4::new(
+            {
+                let mut sum = 0.0;
+                let row: [f32; 4] = self.get_row(0);
+                let col: [f32; 4] = m.get_column(3);
+
+                for i in 0..row.len() {
+                    sum += row[i] * col[i];
+                }
+
+                sum
+            },
+            {
+                let mut sum = 0.0;
+                let row: [f32; 4] = self.get_row(1);
+                let col: [f32; 4] = m.get_column(3);
+
+                for i in 0..row.len() {
+                    sum += row[i] * col[i];
+                }
+
+                sum
+            },
+            {
+                let mut sum = 0.0;
+                let row: [f32; 4] = self.get_row(2);
+                let col: [f32; 4] = m.get_column(3);
+
+                for i in 0..row.len() {
+                    sum += row[i] * col[i];
+                }
+
+                sum
+            },
+            {
+                let mut sum = 0.0;
+                let row: [f32; 4] = self.get_row(3);
+                let col: [f32; 4] = m.get_column(3);
+
+                for i in 0..row.len() {
+                    sum += row[i] * col[i];
+                }
+
+                sum
+            },
+        );
+
+        *self = Matrix4::from_columns(col0, col1, col2, col3);
     }
 
     pub fn print(&self) {
@@ -201,15 +406,6 @@ impl Matrix4 {
             println!();
         }
     }
-
-    //#[cfg_attr(rustfmt, rustfmt_skip)]
-    // remember that each Vector is a COLUMN
-    // pub fn transform(&self, m: Matrix4) -> Matrix4 {
-    //     //   c,r
-    //     // Matrix4::new(
-    //     //     self.x.x * d
-    //     // )
-    // }
 }
 
 // ###########################  TESTS  ####################################################################
@@ -283,6 +479,8 @@ mod matrix_tests {
 
         let col = mat.get_column(0);
 
+        mat.print();
+
         assert_eq!(col[0], 1.0);
         assert_eq!(col[1], 2.0);
         assert_eq!(col[2], 3.0);
@@ -298,8 +496,31 @@ mod matrix_tests {
         let _col = mat.get_column(4);
     }
 
-    //#[test]
+    #[test]
+    #[cfg_attr(rustfmt, rustfmt_skip)]
     fn test_matrix_transform() {
-        todo!();
+        let mut m1 = Matrix4::new(
+            2.0, 1.0, 6.0, 1.0, 
+            3.0, 2.0, 7.0, 2.0, 
+            4.0, 3.0, 8.0, 3.0, 
+            5.0, 4.0, 9.0, 4.0
+        );
+
+        let m2 = Matrix4::new(
+            5.0,5.0,6.0,6.0,
+            5.0,5.0,6.0,6.0,
+            5.0,5.0,6.0,6.0,
+            5.0,5.0,6.0,6.0
+        );
+        println!("Printing m1: ");
+        m1.print();
+        println!("Printing m2: ");
+        m2.print();
+
+        m1.transform(m2);
+
+        println!("Results of m1 x m2: ");
+        m1.print();
+
     }
 }
