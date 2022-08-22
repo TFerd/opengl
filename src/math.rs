@@ -390,7 +390,10 @@ impl Matrix4 {
             },
         );
 
-        *self = Matrix4::from_columns(col0, col1, col2, col3);
+        self.x = col0;
+        self.y = col1;
+        self.z = col2;
+        self.w = col3;
     }
 
     pub fn print(&self) {
@@ -521,6 +524,17 @@ mod matrix_tests {
 
         println!("Results of m1 x m2: ");
         m1.print();
+
+        let row0 = m1.get_row(0);
+        for i in row0 {
+            assert_eq!(i, 79.0);
+        }
+        let col0 = m1.get_column(0);
+        
+        assert_eq!(col0[0], 79.0);
+        assert_eq!(col0[1], 57.0);
+        assert_eq!(col0[2], 167.0);
+        assert_eq!(col0[3],57.0);
 
     }
 }
