@@ -50,7 +50,38 @@ impl Vector4 {
     pub fn as_array(&self) -> [f32; 4] {
         [self.x, self.y, self.z, self.w]
     }
+
+    pub fn add_scalar(&mut self, n: f32) {
+        //self.iter();
+        self.x += n;
+        self.y += n;
+        self.z += n;
+        self.w += n;
+    }
+    pub fn subtract_scalar(&mut self, n: f32) {
+        self.x -= n;
+        self.y -= n;
+        self.z -= n;
+        self.w -= n;
+    }
+    pub fn multiply_scalar(&mut self, n: f32) {
+        self.x *= n;
+        self.y *= n;
+        self.z *= n;
+        self.w *= n;
+    }
+    pub fn divide_scalar(&mut self, n: f32) {
+        todo!();
+    }
 }
+
+// impl Iterator for Vector4 {
+//     type Item = f32;
+
+//     fn next(&mut self) -> Option<Self::Item> {
+//         match self
+//     }
+// }
 
 // @TODO: not sure if needed
 // impl IntoIterator for Vector4{
@@ -193,6 +224,31 @@ impl Matrix4 {
         }
     }
 
+    pub fn add_scalar(&mut self, n: f32) {
+        self.x.add_scalar(n);
+        self.y.add_scalar(n);
+        self.z.add_scalar(n);
+        self.w.add_scalar(n);
+    }
+
+    pub fn subtract_scalar(&mut self, n: f32) {
+        self.x.subtract_scalar(n);
+        self.y.subtract_scalar(n);
+        self.z.subtract_scalar(n);
+        self.w.subtract_scalar(n);
+    }
+
+    pub fn multiply_scalar(&mut self, n: f32) {
+        self.x.multiply_scalar(n);
+        self.y.multiply_scalar(n);
+        self.z.multiply_scalar(n);
+        self.w.multiply_scalar(n);
+    }
+
+    pub fn divide_scalar(&mut self, n: f32) {
+        todo!();
+    }
+
     // #[cfg_attr(rustfmt, rustfmt_skip)]
     // remember that each Vector is a COLUMN
     // traverse left to right of LEFT matrix , top to bottom of RIGHT matrix
@@ -278,6 +334,43 @@ mod vector_tests {
 
         for i in vec_arr {
             assert_eq!(i, 0.9);
+        }
+    }
+
+    #[test]
+    fn test_add_scalar() {
+        let mut vec = Vector4::new(0.5, 0.5, 0.6, 0.2);
+        vec.add_scalar(2.0);
+
+        let vec = vec.as_array();
+
+        assert_eq!(vec[0], 2.5);
+        assert_eq!(vec[1], 2.5);
+        assert_eq!(vec[2], 2.6);
+        assert_eq!(vec[3], 2.2);
+    }
+
+    #[test]
+    fn test_subtract_scalar() {
+        let mut vec = Vector4::new(1.0, 1.0, 1.0, 1.0);
+        vec.subtract_scalar(2.0);
+
+        let vec = vec.as_array();
+
+        for i in vec {
+            assert_eq!(i, -1.0);
+        }
+    }
+
+    #[test]
+    fn test_multiply_scalar() {
+        let mut vec = Vector4::new(2.0, 2.0, 2.0, 2.0);
+        vec.multiply_scalar(0.5);
+
+        let vec = vec.as_array();
+
+        for i in vec {
+            assert_eq!(i, 1.0);
         }
     }
 }
