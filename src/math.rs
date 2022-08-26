@@ -9,6 +9,7 @@ pub struct Vector2 {
     pub y: f32,
 }
 
+#[derive(Debug)]
 pub struct Vector3 {
     pub x: f32,
     pub y: f32,
@@ -37,7 +38,6 @@ impl Vector3 {
     }
 }
 
-#[allow(dead_code)]
 impl Vector4 {
     pub fn new(x: f32, y: f32, z: f32, w: f32) -> Self {
         Self { x, y, z, w }
@@ -84,6 +84,14 @@ impl Vector4 {
         self.w /= n;
     }
 
+    // @params: trans must be a translation matrix created by that function in Matrix4
+    pub fn translate(&mut self, trans: Matrix4) {
+        self.x = multiply_col_with_row(self.as_array(), trans.get_row(0));
+        self.y = multiply_col_with_row(self.as_array(), trans.get_row(1));
+        self.z = multiply_col_with_row(self.as_array(), trans.get_row(2));
+        self.w = multiply_col_with_row(self.as_array(), trans.get_row(3));
+    }
+
     #[allow(dead_code)]
     #[allow(non_snake_case)]
     pub fn rotate(&mut self, axis: Axis, angle: f32) {
@@ -116,10 +124,10 @@ impl Vector4 {
             }
         }
 
-        self.x = Matrix4::multiply_col_with_row(self.as_array(), mat.get_row(0));
-        self.y = Matrix4::multiply_col_with_row(self.as_array(), mat.get_row(1));
-        self.z = Matrix4::multiply_col_with_row(self.as_array(), mat.get_row(2));
-        self.w = Matrix4::multiply_col_with_row(self.as_array(), mat.get_row(3));
+        self.x = multiply_col_with_row(self.as_array(), mat.get_row(0));
+        self.y = multiply_col_with_row(self.as_array(), mat.get_row(1));
+        self.z = multiply_col_with_row(self.as_array(), mat.get_row(2));
+        self.w = multiply_col_with_row(self.as_array(), mat.get_row(3));
     }
 
     pub fn normalize(&mut self) {
@@ -155,20 +163,19 @@ impl Vector4 {
 
 #[allow(dead_code)]
 //Each vec here is a COLUMN
-struct Matrix2 {
+pub struct Matrix2 {
     pub x: Vector2,
     pub y: Vector2,
 }
 
 #[allow(dead_code)]
-struct Matrix3 {
+pub struct Matrix3 {
     pub x: Vector3,
     pub y: Vector3,
     pub z: Vector3,
 }
 
-#[allow(dead_code)]
-struct Matrix4 {
+pub struct Matrix4 {
     pub x: Vector4,
     pub y: Vector4,
     pub z: Vector4,
@@ -218,7 +225,6 @@ impl Matrix3 {
     }
 }
 
-#[allow(dead_code)]
 impl Matrix4 {
     #[cfg_attr(rustfmt, rustfmt_skip)]
     pub fn new(
@@ -251,6 +257,15 @@ impl Matrix4 {
             0.0, 1.0, 0.0, 0.0,
             0.0, 0.0, 1.0, 0.0,
             0.0, 0.0, 0.0, 1.0,
+        )
+    }
+
+    pub fn create_translation(identity: Matrix4, vec: Vector3) -> Matrix4 {
+        Matrix4::from_columns(
+            identity.x,
+            identity.y,
+            identity.z,
+            Vector4::new(vec.x, vec.y, vec.z, identity.w.w),
         )
     }
 
@@ -316,49 +331,39 @@ impl Matrix4 {
     // remember that each Vector is a COLUMN
     // traverse left to right of LEFT matrix , top to bottom of RIGHT matrix
     // Consuming bc we dont want the old matrix
-    pub fn translate(&mut self, m: Matrix4) {
+    pub fn multiply_matrix(&mut self, m: Matrix4) {
         let col0 = Vector4::new(
-            Matrix4::multiply_col_with_row(m.get_column(0), self.get_row(0)),
-            Matrix4::multiply_col_with_row(m.get_column(0), self.get_row(1)),
-            Matrix4::multiply_col_with_row(m.get_column(0), self.get_row(2)),
-            Matrix4::multiply_col_with_row(m.get_column(0), self.get_row(3)),
+            multiply_col_with_row(m.get_column(0), self.get_row(0)),
+            multiply_col_with_row(m.get_column(0), self.get_row(1)),
+            multiply_col_with_row(m.get_column(0), self.get_row(2)),
+            multiply_col_with_row(m.get_column(0), self.get_row(3)),
         );
 
         let col1 = Vector4::new(
-            Matrix4::multiply_col_with_row(m.get_column(1), self.get_row(0)),
-            Matrix4::multiply_col_with_row(m.get_column(1), self.get_row(1)),
-            Matrix4::multiply_col_with_row(m.get_column(1), self.get_row(2)),
-            Matrix4::multiply_col_with_row(m.get_column(1), self.get_row(3)),
+            multiply_col_with_row(m.get_column(1), self.get_row(0)),
+            multiply_col_with_row(m.get_column(1), self.get_row(1)),
+            multiply_col_with_row(m.get_column(1), self.get_row(2)),
+            multiply_col_with_row(m.get_column(1), self.get_row(3)),
         );
 
         let col2 = Vector4::new(
-            Matrix4::multiply_col_with_row(m.get_column(2), self.get_row(0)),
-            Matrix4::multiply_col_with_row(m.get_column(2), self.get_row(1)),
-            Matrix4::multiply_col_with_row(m.get_column(2), self.get_row(2)),
-            Matrix4::multiply_col_with_row(m.get_column(2), self.get_row(3)),
+            multiply_col_with_row(m.get_column(2), self.get_row(0)),
+            multiply_col_with_row(m.get_column(2), self.get_row(1)),
+            multiply_col_with_row(m.get_column(2), self.get_row(2)),
+            multiply_col_with_row(m.get_column(2), self.get_row(3)),
         );
 
         let col3 = Vector4::new(
-            Matrix4::multiply_col_with_row(m.get_column(3), self.get_row(0)),
-            Matrix4::multiply_col_with_row(m.get_column(3), self.get_row(1)),
-            Matrix4::multiply_col_with_row(m.get_column(3), self.get_row(2)),
-            Matrix4::multiply_col_with_row(m.get_column(3), self.get_row(3)),
+            multiply_col_with_row(m.get_column(3), self.get_row(0)),
+            multiply_col_with_row(m.get_column(3), self.get_row(1)),
+            multiply_col_with_row(m.get_column(3), self.get_row(2)),
+            multiply_col_with_row(m.get_column(3), self.get_row(3)),
         );
 
         self.x = col0;
         self.y = col1;
         self.z = col2;
         self.w = col3;
-    }
-
-    fn multiply_col_with_row(col: [f32; 4], row: [f32; 4]) -> f32 {
-        let mut sum = 0.0;
-
-        for i in 0..col.len() {
-            sum += col[i] * row[i];
-        }
-
-        sum
     }
 
     pub fn print(&self) {
@@ -376,6 +381,16 @@ impl Matrix4 {
     }
 }
 
+fn multiply_col_with_row(col: [f32; 4], row: [f32; 4]) -> f32 {
+    let mut sum = 0.0;
+
+    for i in 0..col.len() {
+        sum += col[i] * row[i];
+    }
+
+    sum
+}
+
 pub fn convert_to_radians(angle: f32) -> f32 {
     angle * (std::f32::consts::PI / 180.0)
 }
@@ -388,7 +403,10 @@ pub fn convert_to_degrees(radians: f32) -> f32 {
 #[cfg(test)]
 mod vector_tests {
     use crate::math::Axis;
+    use crate::math::Vector3;
     use crate::math::Vector4;
+
+    use super::Matrix4;
     #[test]
     fn test_get_index() {
         let vec = Vector4::new(0.0, 1.0, 2.0, 3.0);
@@ -477,12 +495,30 @@ mod vector_tests {
         println!("{:?}", vec);
         assert_eq!(1, 1);
     }
+
+    #[test]
+    fn test_create_vec_and_translate() {
+        let mut vec = Vector4::new(1.0, 0.0, 0.0, 1.0);
+
+        let id = Matrix4::identity();
+        let trans = Matrix4::create_translation(id, Vector3::new(1.0, 1.0, 0.0));
+
+        vec.translate(trans);
+
+        println!("{:?}", vec);
+
+        assert_eq!(vec.x, 2.0);
+        assert_eq!(vec.y, 1.0);
+        assert_eq!(vec.z, 0.0);
+        assert_eq!(vec.w, 1.0);
+    }
 }
 
 #[allow(dead_code)]
 #[cfg(test)]
 mod matrix_tests {
     use super::Matrix4;
+    use crate::math::*;
 
     #[test]
     fn test_matrix4_identity() {
@@ -563,7 +599,7 @@ mod matrix_tests {
         println!("Printing m2: ");
         m2.print();
 
-        m1.translate(m2);
+        m1.multiply_matrix(m2);
 
         println!("Results of m1 x m2: ");
         m1.print();
@@ -586,7 +622,7 @@ mod matrix_tests {
         let col: [f32; 4] = [4.0, 5.0, 3.5, 0.7];
         let row: [f32; 4] = [1.3, 1.2, 0.7, 0.4];
 
-        let res = (Matrix4::multiply_col_with_row(col, row) * 100.0).round() / 100.0; // rounded to two decimal places
+        let res = (multiply_col_with_row(col, row) * 100.0).round() / 100.0; // rounded to two decimal places
 
         assert_eq!(res, 13.93);
     }
