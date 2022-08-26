@@ -41,3 +41,13 @@ impl Buffer {
         }
     }
 }
+
+// #[cfg(test)]
+// mod buffer_tests {
+//     use super::Buffer;
+//     #[test]
+//     fn test_new_buffer() {
+//         let vbo = Buffer::new().expect("Error making buffer in test");
+//         assert_ne!(vbo.0, 0);
+//     }
+// }

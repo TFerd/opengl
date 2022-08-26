@@ -1,3 +1,9 @@
+pub enum Axis {
+    X,
+    Y,
+    Z,
+}
+
 pub struct Vector2 {
     pub x: f32,
     pub y: f32,
@@ -9,6 +15,7 @@ pub struct Vector3 {
     pub z: f32,
 }
 
+#[derive(Debug)]
 pub struct Vector4 {
     pub x: f32,
     pub y: f32,
@@ -71,7 +78,60 @@ impl Vector4 {
         self.w *= n;
     }
     pub fn divide_scalar(&mut self, n: f32) {
-        todo!();
+        self.x /= n;
+        self.y /= n;
+        self.z /= n;
+        self.w /= n;
+    }
+
+    #[allow(dead_code)]
+    #[allow(non_snake_case)]
+    pub fn rotate(&mut self, axis: Axis, angle: f32) {
+        let mat: Matrix4;
+        match axis {
+            Axis::X => {
+                mat = Matrix4::from_columns(
+                    Vector4::new(1.0, 0.0, 0.0, 0.0),
+                    Vector4::new(0.0, angle.cos(), angle.sin(), 0.0),
+                    Vector4::new(0.0, -1.0 * angle.sin(), angle.cos(), 0.0),
+                    Vector4::new(0.0, 0.0, 0.0, 1.0),
+                );
+            }
+
+            Axis::Y => {
+                mat = Matrix4::from_columns(
+                    Vector4::new(angle.cos(), 0.0, -1.0 * angle.sin(), 0.0),
+                    Vector4::new(0.0, 1.0, 0.0, 0.0),
+                    Vector4::new(angle.sin(), 0.0, angle.cos(), 0.0),
+                    Vector4::new(0.0, 0.0, 0.0, 1.0),
+                );
+            }
+            Axis::Z => {
+                mat = Matrix4::from_columns(
+                    Vector4::new(angle.cos(), angle.sin(), 0.0, 0.0),
+                    Vector4::new(-1.0 * angle.sin(), angle.cos(), 0.0, 0.0),
+                    Vector4::new(0.0, 0.0, 1.0, 0.0),
+                    Vector4::new(0.0, 0.0, 0.0, 1.0),
+                );
+            }
+        }
+
+        self.x = Matrix4::multiply_col_with_row(self.as_array(), mat.get_row(0));
+        self.y = Matrix4::multiply_col_with_row(self.as_array(), mat.get_row(1));
+        self.z = Matrix4::multiply_col_with_row(self.as_array(), mat.get_row(2));
+        self.w = Matrix4::multiply_col_with_row(self.as_array(), mat.get_row(3));
+    }
+
+    pub fn normalize(&mut self) {
+        let length: f32 = self.get_length();
+
+        self.x = self.x / length;
+        self.y = self.y / length;
+        self.z = self.z / length;
+    }
+
+    pub fn get_length(&self) -> f32 {
+        ((self.x * self.x) + (self.y * self.y) + (self.z * self.z)).sqrt()
     }
 }
 
@@ -246,14 +306,17 @@ impl Matrix4 {
     }
 
     pub fn divide_scalar(&mut self, n: f32) {
-        todo!();
+        self.x.divide_scalar(n);
+        self.y.divide_scalar(n);
+        self.z.divide_scalar(n);
+        self.w.divide_scalar(n);
     }
 
     // #[cfg_attr(rustfmt, rustfmt_skip)]
     // remember that each Vector is a COLUMN
     // traverse left to right of LEFT matrix , top to bottom of RIGHT matrix
     // Consuming bc we dont want the old matrix
-    pub fn transform(&mut self, m: Matrix4) {
+    pub fn translate(&mut self, m: Matrix4) {
         let col0 = Vector4::new(
             Matrix4::multiply_col_with_row(m.get_column(0), self.get_row(0)),
             Matrix4::multiply_col_with_row(m.get_column(0), self.get_row(1)),
@@ -313,9 +376,18 @@ impl Matrix4 {
     }
 }
 
+pub fn convert_to_radians(angle: f32) -> f32 {
+    angle * (std::f32::consts::PI / 180.0)
+}
+
+pub fn convert_to_degrees(radians: f32) -> f32 {
+    radians * (180.0 / std::f32::consts::PI)
+}
+
 // ###########################  TESTS  ####################################################################
 #[cfg(test)]
 mod vector_tests {
+    use crate::math::Axis;
     use crate::math::Vector4;
     #[test]
     fn test_get_index() {
@@ -372,6 +444,38 @@ mod vector_tests {
         for i in vec {
             assert_eq!(i, 1.0);
         }
+    }
+
+    #[test]
+    fn test_divide_scalar() {
+        todo!()
+    }
+
+    #[test]
+    fn test_normalize() {
+        let mut vec = Vector4::new(3.0, 5.0, 7.0, 1.0);
+        vec.normalize();
+
+        assert_eq!((vec.x * 1000000.0).round() / 1000000.0, 0.329293);
+        assert_eq!((vec.y * 1000000.0).round() / 1000000.0, 0.548821);
+        assert_eq!((vec.z * 100000.0).round() / 100000.0, 0.76835);
+    }
+
+    #[test]
+    fn test_get_length() {
+        let vec = Vector4::new(5.0, 7.0, 3.0, 1.0);
+        let length = vec.get_length();
+
+        assert_eq!((length * 100000.0).round() / 100000.0, 9.11043);
+    }
+
+    #[test]
+    fn test_rotate() {
+        let mut vec = Vector4::new(5.0, 5.0, 9.0, 1.0);
+
+        vec.rotate(Axis::X, 90.0);
+        println!("{:?}", vec);
+        assert_eq!(1, 1);
     }
 }
 
@@ -440,7 +544,7 @@ mod matrix_tests {
 
     #[test]
     #[cfg_attr(rustfmt, rustfmt_skip)]
-    fn test_matrix_transform() {
+    fn test_matrix_translate() {
         let mut m1 = Matrix4::new(
             2.0, 1.0, 6.0, 1.0,
             3.0, 2.0, 7.0, 2.0,
@@ -459,7 +563,7 @@ mod matrix_tests {
         println!("Printing m2: ");
         m2.print();
 
-        m1.transform(m2);
+        m1.translate(m2);
 
         println!("Results of m1 x m2: ");
         m1.print();
@@ -486,4 +590,13 @@ mod matrix_tests {
 
         assert_eq!(res, 13.93);
     }
+}
+
+#[cfg(test)]
+mod math_tests {
+    #[test]
+    fn test_radians_to_deg() {}
+
+    #[test]
+    fn test_deg_to_radians() {}
 }
