@@ -2,6 +2,8 @@ use std::ffi::CString;
 
 use gl::types::*;
 
+use crate::math::Matrix4;
+
 pub enum ShaderType {
     Vertex = gl::VERTEX_SHADER as isize,
     Fragment = gl::FRAGMENT_SHADER as isize,
@@ -214,4 +216,8 @@ impl ShaderProgram {
 // and let them enter what they want)
 pub fn uniform4f(location: i32, r: f32, g: f32, b: f32, a: f32) {
     unsafe { gl::Uniform4f(location, r, g, b, a) }
+}
+
+pub fn uniform_matrix_4fv(location: i32, data: Matrix4) {
+    unsafe { gl::UniformMatrix4fv(location, 1, gl::FALSE, data.to_ptr()) }
 }
