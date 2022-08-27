@@ -92,7 +92,6 @@ impl Vector4 {
         self.w = multiply_col_with_row(self.as_array(), trans.get_row(3));
     }
 
-    #[allow(dead_code)]
     #[allow(non_snake_case)]
     pub fn rotate(&mut self, axis: Axis, angle: f32) {
         let mat: Matrix4;
@@ -331,6 +330,7 @@ impl Matrix4 {
     // remember that each Vector is a COLUMN
     // traverse left to right of LEFT matrix , top to bottom of RIGHT matrix
     // Consuming bc we dont want the old matrix
+    // @TODO: look into deleting this
     pub fn multiply_matrix(&mut self, m: Matrix4) {
         let col0 = Vector4::new(
             multiply_col_with_row(m.get_column(0), self.get_row(0)),
@@ -364,6 +364,19 @@ impl Matrix4 {
         self.y = col1;
         self.z = col2;
         self.w = col3;
+    }
+
+    pub fn as_array(&self) -> [[f32; 4]; 4] {
+        [
+            self.x.as_array(),
+            self.y.as_array(),
+            self.z.as_array(),
+            self.w.as_array(),
+        ]
+    }
+
+    pub fn to_ptr(&self) -> *const f32 {
+        &self.as_array()[0][0]
     }
 
     pub fn print(&self) {
@@ -500,8 +513,7 @@ mod vector_tests {
     fn test_create_vec_and_translate() {
         let mut vec = Vector4::new(1.0, 0.0, 0.0, 1.0);
 
-        let id = Matrix4::identity();
-        let trans = Matrix4::create_translation(id, Vector3::new(1.0, 1.0, 0.0));
+        let trans = Matrix4::create_translation(Matrix4::identity(), Vector3::new(1.0, 1.0, 0.0));
 
         vec.translate(trans);
 
